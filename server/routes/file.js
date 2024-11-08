@@ -133,6 +133,47 @@ router.get("/assignedfiles", fetchuser, async (req, res) => {
     }
 });
 
+//... when he clicks to status ...//
+router.post("/changefilestatus/:fileId", fetchuser, async (req, res) => {
+    try {
+        const { fileId } = req.params;
+
+        // Find the file by ID
+        const file = await File.findById(fileId);
+
+        // Check if file exists
+        if (!file) {
+            return res.status(404).json({ success: false, error: "File not found" });
+        }
+
+        // Check if the logged-in user is authorized to change the file status
+        if (file.assignedTo.toString() !== req.user.id) {
+            return res.status(403).json({ success: false, error: "You are not authorized to change the status of this file" });
+        }
+
+        // Update the file status to "Completed"
+        file.status = "Completed";
+
+        // Update the last entry in movement history to "Completed"
+        file.movementhistory.forEach(file => {
+            if (file.movedTo == req.user.id){
+                file.statusMove = "Completed"
+            }
+        });
+
+        // Save the changes
+        await file.save();
+
+        return res.status(200).json({ success: true, message: "File status updated to Completed", file });
+    } catch (error) {
+        console.error(error.message);
+        return res.status(500).json({ success: false, error: "Internal Server Error" });
+    }
+});
+
+
+
+
 
 
 
