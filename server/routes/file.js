@@ -7,7 +7,7 @@ const router=express.Router();
 
 
 router.post("/", fetchuser, async (req, res) => {
-    const { title, description, department, assignedTo, fileDetails } = req.body;
+    const { title, description, fileDetails } = req.body;
 
     if (!fileDetails || !Array.isArray(fileDetails)) {
         return res.status(400).json({ success: false, error: "fileDetails should be an array" });
@@ -28,8 +28,6 @@ router.post("/", fetchuser, async (req, res) => {
         const file = await File.create({
             title,
             description,
-            department,
-            assignedTo,
             owner: req.user.id,
             fileDetails: formattedFileDetails
         });
@@ -48,7 +46,7 @@ router.post("/", fetchuser, async (req, res) => {
 ///... showing all the file of a owner matlab jo wo sabhi send kiya hai...//
 router.get("/fileofowner",fetchuser,async(req,res)=>{
     const ownerId=req.user.id;
-    const filesofowner=await File.find({owner: ownerId});
+    const filesofowner=await File.find({owner: ownerId}).populate("owner").populate("movementhistory.movedTo");
     return res.status(200).json({success: true,filesofowner}) ;
 })
 
@@ -57,7 +55,7 @@ router.get("deletefile/:fileid",fetchuser,async(req,res)=>{
     const ownerId=req.user._id;
     let file=await File.findByIdAndDelete(ownerId);
     return res.json.status(200).json({success: true,file});
-})
+}) 
 
 //...move a file..//
 router.post("/move/:fileId", fetchuser, async (req, res) => {
@@ -170,6 +168,7 @@ router.post("/changefilestatus/:fileId", fetchuser, async (req, res) => {
         return res.status(500).json({ success: false, error: "Internal Server Error" });
     }
 });
+
 
 
 
