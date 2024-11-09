@@ -19,7 +19,10 @@ const UserSchema=new mongoose.Schema({
     },
     departmentName:{
         type: String,
-        required: true
+        enum:["CSE","IT","EEE","ETC","CE"]
+    },
+    tenderType:{
+        type: String,
     },
     typeofAuthenticator:{
         type: String,

@@ -10,10 +10,6 @@ const departSchema=new mongoose.Schema({
             ref: User
         }
     ],
-    admin:{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: User
-    }
 
 },{
     timestamps: true,
